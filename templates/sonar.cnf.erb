@@ -1,0 +1,35 @@
+##################
+# File managed by puppet, don't edit
+##################
+
+[mysqld]
+#bind-address            = 0.0.0.0
+#default-storage-engine  = INNODB
+#transaction-isolation   = READ-COMMITTED
+#character-set-server    = latin1
+#collation-server        = latin1_general_cs
+#max_connections         = 50
+#max_user_connections    = 49
+
+
+################################################################################
+# * Fine Tuning
+################################################################################
+max_allowed_packet      = 128M
+
+################################################################################
+# * InnoDB
+################################################################################
+innodb_file_per_table           = 1
+innodb_buffer_pool_size         = <%= scope['sonar::mysql_innodb_buffer_pool_size'] %>
+innodb_thread_concurrency       = 8
+innodb_flush_method             = O_DIRECT
+innodb_flush_log_at_trx_commit  = 1
+innodb_lock_wait_timeout        = 90
+innodb_rollback_on_timeout      = 1
+#innodb_additional_mem_pool_size = 20M
+
+innodb_doublewrite              = 1
+innodb_log_file_size            = 512m
+innodb_log_buffer_size          = 64M
+innodb_compression_level = 9

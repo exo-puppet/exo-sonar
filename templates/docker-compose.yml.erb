@@ -1,0 +1,30 @@
+##################
+# File managed by puppet, don't edit
+##################
+version: '2'
+services:
+  sonar:
+    image: sonarqube:5.6.1-alpine
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9092:9092"
+    links:
+      - mysql:db
+    environment:
+      - SONARQUBE_JDBC_USER=sonar
+      - SONARQUBE_JDBC_PASSWORD=<%= scope['sonar::database_password'] %>
+      - SONARQUBE_JDBC_URL=jdbc:mysql://db/sonar?useUnicode=true&characterEncoding=utf8
+    volumes:
+      - <%= scope['sonar::params::data_dir'] %>:/opt/sonarqube/data
+      - <%= scope['sonar::params::extensions_dir'] %>:/opt/sonarqube/extensions
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=<%= scope['sonar::database_root_password'] %>
+      - MYSQL_DATABASE=sonar
+      - MYSQL_USER=sonar
+      - MYSQL_PASSWORD=<%= scope['sonar::database_password'] %>
+    volumes:
+      - <%= scope['sonar::params::mysql_data_dir'] %>:/var/lib/mysql
+      - <%= scope['sonar::params::mysql_log_dir'] %>:/var/log/mysql
+      - <%= scope['sonar::params::mysql_config_dir'] %>/sonar.cnf:/etc/mysql/conf.d/sonar.cnf:ro
