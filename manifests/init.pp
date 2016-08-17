@@ -89,7 +89,7 @@ class sonar (
     ensure      => present,
     content     => template ('sonar/sonar.cnf.erb'),
     owner       => 'root',
-    group       => 'root',
+    group       => '999',
     mode        => '640',
   } ->
 
