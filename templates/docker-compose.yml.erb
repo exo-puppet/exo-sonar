@@ -17,6 +17,10 @@ services:
     volumes:
       - <%= scope['sonar::params::data_dir'] %>:/opt/sonarqube/data
       - <%= scope['sonar::params::extensions_dir'] %>:/opt/sonarqube/extensions
+    labels:
+<% scope['sonar::sonar_container_labels'].each do |label| -%>
+      - "<%= label %>"
+<% end -%>
   mysql:
     image: mysql:5.7
     environment:
@@ -28,3 +32,7 @@ services:
       - <%= scope['sonar::params::mysql_data_dir'] %>:/var/lib/mysql
       - <%= scope['sonar::params::mysql_log_dir'] %>:/var/log/mysql
       - <%= scope['sonar::params::mysql_config_dir'] %>/sonar.cnf:/etc/mysql/conf.d/sonar.cnf:ro
+    labels:
+<% scope['sonar::mysql_container_labels'].each do |label| -%>
+      - "<%= label %>"
+<% end -%>

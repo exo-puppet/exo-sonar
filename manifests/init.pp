@@ -33,6 +33,16 @@
 #   (MANDATORY)
 #
 #   The mysql buffer pool size to use
+#
+# [+sonar_container_labels+]
+#   (OPTIONAL) (default: empty)
+#
+#  Additional labels de attach to the sonar container
+#
+# [+mysql_container_labels+]
+#   (OPTIONAL) (default: empty)
+#
+#  Additional labels de attach to the mysql container
 ################################################################################
 class sonar (
   $install_dir        = '/opt/sonar',
@@ -40,7 +50,9 @@ class sonar (
   $log_dir            = '/var/log/sonar',
   $database_password,
   $database_root_password,
-  $mysql_innodb_buffer_pool_size       = '8g',
+  $mysql_innodb_buffer_pool_size        = '8g',
+  $sonar_container_labels               = [],
+  $mysql_container_labels               = [],
 ) {
 
   include sonar::params
