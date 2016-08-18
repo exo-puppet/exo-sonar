@@ -59,6 +59,8 @@ class sonar (
   $sonar_container_labels               = [],
   $mysql_container_labels               = [],
   $front_network                        = undef,
+  $parameters                           = [],
+  $install_crowd_plugin                 = false,
 ) {
 
   include sonar::params
@@ -79,6 +81,9 @@ class sonar (
     ensure      => directory,
   } ->
   file { "${sonar::params::extensions_dir}" :
+    ensure      => directory,
+  } ->
+  file { "${sonar::params::extensions_dir}/plugins" :
     ensure      => directory,
   } ->
   file { "${sonar::params::mysql_data_dir}" :
@@ -120,6 +125,19 @@ class sonar (
     owner       => 'root',
     group       => 'root',
     mode        => '640',
+  }
+
+  ########################
+  ## Crowd plugin
+  ########################
+  if $sonar::install_crowd_plugin == true {
+    wget::fetch { 'sonar_crowd':
+      source_url          => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/2.0/sonar-crowd-plugin-2.0.jar",
+      target_directory    => "${sonar::params::extensions_dir}/plugins",
+      target_file         => "sonar-crowd-plugin-2.0.jar",
+      require             => File["${sonar::params::extensions_dir}/plugins"],
+      notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
+    }
   }
 
   ###########################

@@ -32,6 +32,9 @@ services:
 <% scope['sonar::sonar_container_labels'].each do |label| -%>
       - "<%= label %>"
 <% end -%>
+<% if scope['sonar::parameters'].size > 0 -%>
+    command : [ <% scope['sonar::parameters'].each do |parameter| -%>"<%= parameter -%>", <% end -%> ]
+<% end -%> 
   mysql:
     image: mysql:5.7
     environment:
