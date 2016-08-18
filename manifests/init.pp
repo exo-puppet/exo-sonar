@@ -43,6 +43,11 @@
 #   (OPTIONAL) (default: empty)
 #
 #  Additional labels de attach to the mysql container
+# [+front_network+]
+#   (OPTIONAL) (default: undef)
+#
+#  Name of en eventual network to attach the sonar container on. 
+#  Useful to allow a reverse proxy to reach the sonar container network
 ################################################################################
 class sonar (
   $install_dir        = '/opt/sonar',
@@ -53,6 +58,7 @@ class sonar (
   $mysql_innodb_buffer_pool_size        = '8g',
   $sonar_container_labels               = [],
   $mysql_container_labels               = [],
+  $front_network                        = undef,
 ) {
 
   include sonar::params

@@ -2,12 +2,18 @@
 # File managed by puppet, don't edit
 ##################
 version: '2'
+networks:
+  front:
+<% if scope['sonar::front_network'] != :undef -%>
+    external:
+      name: <%= scope['sonar::front_network'] %>
+<% end -%>
+  database:
 services:
   sonar:
     image: sonarqube:5.6.1-alpine
-    ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9092:9092"
+    expose:
+      - 9000
     links:
       - mysql:db
     environment:
@@ -17,6 +23,11 @@ services:
     volumes:
       - <%= scope['sonar::params::data_dir'] %>:/opt/sonarqube/data
       - <%= scope['sonar::params::extensions_dir'] %>:/opt/sonarqube/extensions
+    networks:
+      front:
+        aliases:
+          - sonar
+      database:
     labels:
 <% scope['sonar::sonar_container_labels'].each do |label| -%>
       - "<%= label %>"
@@ -32,6 +43,8 @@ services:
       - <%= scope['sonar::params::mysql_data_dir'] %>:/var/lib/mysql
       - <%= scope['sonar::params::mysql_log_dir'] %>:/var/log/mysql
       - <%= scope['sonar::params::mysql_config_dir'] %>/sonar.cnf:/etc/mysql/conf.d/sonar.cnf:ro
+    networks:
+      database:
     labels:
 <% scope['sonar::mysql_container_labels'].each do |label| -%>
       - "<%= label %>"
