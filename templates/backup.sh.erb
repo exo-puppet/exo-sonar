@@ -12,4 +12,4 @@ docker run -ti -e USER=<%= scope['sonar::backup_user'] %> -e PASSWORD=<%= scope[
 chown sonar:sonar ${BACKUP_DIRECTORY}/*
 
 echo Cleaning old backups...
-find <%= scope['sonar::backup_directory'] %> -mintime +${HISTORY} -exec rm -v {} \;
+find <%= scope['sonar::backup_directory'] %> -mtime +${HISTORY} -exec rm -v {} \;
