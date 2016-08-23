@@ -7,7 +7,7 @@ BACKUP_DIRECTORY=<%= scope['sonar::backup_directory'] %>
 docker pull exoplatform/mysql-backup:latest
 
 echo Backuping mysql...
-docker run -ti -e USER=<%= scope['sonar::backup_user'] %> -e PASSWORD=<%= scope['sonar::backup_password'] %> --network sonar_database --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups exoplatform/mysql-backup 
+docker run --rm -e DATABASE=sonar -e USER=<%= scope['sonar::backup_user'] %> -e PASSWORD=<%= scope['sonar::backup_password'] %> --network sonar_database --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups exoplatform/mysql-backup
 
 chown sonar:sonar ${BACKUP_DIRECTORY}/*
 
