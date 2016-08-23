@@ -46,6 +46,7 @@ services:
       - <%= scope['sonar::params::mysql_data_dir'] %>:/var/lib/mysql
       - <%= scope['sonar::params::mysql_log_dir'] %>:/var/log/mysql
       - <%= scope['sonar::params::mysql_config_dir'] %>/sonar.cnf:/etc/mysql/conf.d/sonar.cnf:ro
+      - <%= scope['sonar::install_dir'] %>/mysql_init/:/docker-entrypoint-initdb.d
     networks:
       database:
     labels:

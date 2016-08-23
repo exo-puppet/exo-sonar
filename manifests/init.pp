@@ -61,6 +61,10 @@ class sonar (
   $front_network                        = undef,
   $parameters                           = [],
   $install_crowd_plugin                 = false,
+  $backup_user                          = 'backup',
+  $backup_password                      = 'backup',
+  $backup_history                       = 15,
+  $backup_directory                     = '/var/backups/sonar',
 ) {
 
   include sonar::params
@@ -68,8 +72,9 @@ class sonar (
   ########################
   ## Directories
   ########################
-  file { "${sonar::install_dir}" :
+  file { "${sonar::install_dir}/bin" :
     ensure      => directory,
+    require     => [File["${sonar::install_dir}"]]
   } ->
   file { "${sonar::log_dir}" :
     ensure      => directory,
@@ -104,6 +109,15 @@ class sonar (
     group       => '999',
     mode        => '775',
   } ->
+  file { "${sonar::install_dir}/mysql_init" :
+    ensure      => directory,
+  } ->
+  file { "${sonar::backup_directory}" :
+    ensure      => directory,
+    owner       => 'sonar',
+    group       => 'root',
+    mode        => '770',
+  }
 
   ########################
   ## Mysql configuration
@@ -114,7 +128,13 @@ class sonar (
     owner       => 'root',
     group       => '999',
     mode        => '640',
-  } ->
+  } -> file { "${sonar::install_dir}/mysql_init/user_backup.sql" :
+    ensure      => present,
+    content     => template ('sonar/mysql/user.sql.erb'),
+    owner       => 'root',
+    group       => '999',
+    mode        => '640',
+  }
 
   ########################
   ## Docker compose file
@@ -149,6 +169,18 @@ class sonar (
       Class['docker::compose'],
       File["${sonar::install_dir}/docker-compose.yml"],
     ],
+  }
+
+  ###########################
+  #  backups scripts
+  ###########################
+  file { "${sonar::install_dir}/bin/backup.sh" :
+    ensure  => 'present',
+    content => template('sonar/backup.sh.erb'),
+    owner       => 'root',
+    group       => 'sonar',
+    mode        => '750',
+    require     => [File["${sonar::install_dir}/bin"]]
   }
 
 }
