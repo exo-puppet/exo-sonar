@@ -3,13 +3,22 @@
 # Day of backups kept
 HISTORY=<%= scope['sonar::backup_history'] %>
 BACKUP_DIRECTORY=<%= scope['sonar::backup_directory'] %>
+DATE=$(date +%Y%m%d-%H%M%S)
+
+DB_BACKUP_NAME=sonar_db_${DATE}.sql.bz2
+EXT_BACKUP_NAME=sonar_extensions_${DATE}.tar.bz2
 
 docker pull exoplatform/mysql-backup:latest
 
+
+
 echo Backuping mysql...
-docker run --rm -e DATABASE=sonar -e USER=<%= scope['sonar::backup_user'] %> -e PASSWORD=<%= scope['sonar::backup_password'] %> --network sonar_database --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups exoplatform/mysql-backup
+docker run --rm -e DATABASE=sonar -e USER=<%= scope['sonar::backup_user'] %> -e PASSWORD=<%= scope['sonar::backup_password'] %> --network sonar_database -e FULLNAME=${DB_BACKUP_NAME} --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups exoplatform/mysql-backup
 
 chown sonar:sonar ${BACKUP_DIRECTORY}/*
+
+echo Backuping plugins...
+tar --directory <%= scope['sonar::base_data_dir'] %> --use-compress-program pbzip2 -cvf ${BACKUP_DIRECTORY}/${EXT_BACKUP_NAME} extensions
 
 echo Cleaning old backups...
 find <%= scope['sonar::backup_directory'] %> -mtime +${HISTORY} -exec rm -v {} \;
