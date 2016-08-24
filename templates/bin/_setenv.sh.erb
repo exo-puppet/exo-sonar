@@ -1,0 +1,15 @@
+#!/bin/bash
+##################
+# File managed by puppet, don't edit
+##################
+
+DATA_DIR=<%= scope['sonar::base_data_dir'] %>
+
+# Backups
+BACKUP_HISTORY=<%= scope['sonar::backup_history'] %>
+BACKUP_DIRECTORY=<%= scope['sonar::backup_directory'] %>
+BACKUP_REMOTE_USER=<%= scope['sonar::backup_remote_user'] %>
+BACKUP_REMOTE_HOST=<%= scope['sonar::backup_remote_host'] %>
+BACKUP_REMOTE_DIRECTORY=<%= scope['sonar::backup_remote_directory'] %>
+BACKUP_DB_USER=<%= scope['sonar::backup_db_user'] %>
+BACKUP_DB_PASSWORD=<%= scope['sonar::backup_db_password'] %>

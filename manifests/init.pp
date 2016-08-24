@@ -61,10 +61,13 @@ class sonar (
   $front_network                        = undef,
   $parameters                           = [],
   $install_crowd_plugin                 = false,
-  $backup_user                          = 'backup',
-  $backup_password                      = 'backup',
-  $backup_history                       = 15,
+  $backup_db_user                       = 'backup',
+  $backup_db_password                   = 'backup',
+  $backup_history                       = 180,
   $backup_directory                     = '/var/backups/sonar',
+  $backup_remote_user,
+  $backup_remote_host,
+  $backup_remote_directory,
 ) {
 
   include sonar::params
@@ -74,6 +77,11 @@ class sonar (
   ########################
   file { "${sonar::install_dir}/bin" :
     ensure      => directory,
+    source      => 'puppet:///modules/sonar/bin',
+    recurse     => true,
+    owner       => 'root',
+    group       => 'sonar',
+    mode        => '750',
     require     => [File["${sonar::install_dir}"]]
   } ->
   file { "${sonar::log_dir}" :
@@ -172,11 +180,11 @@ class sonar (
   }
 
   ###########################
-  #  backups scripts
+  #  scripts configuration
   ###########################
-  file { "${sonar::install_dir}/bin/backup.sh" :
+  file { "${sonar::install_dir}/bin/_setenv.sh" :
     ensure  => 'present',
-    content => template('sonar/backup.sh.erb'),
+    content => template('sonar/bin/_setenv.sh.erb'),
     owner       => 'root',
     group       => 'sonar',
     mode        => '750',
