@@ -50,6 +50,7 @@
 #  Useful to allow a reverse proxy to reach the sonar container network
 ################################################################################
 class sonar (
+  $version            = '5.6.1-alpine',
   $install_dir        = '/opt/sonar',
   $base_data_dir      = '/srv/sonar',
   $log_dir            = '/var/log/sonar',
