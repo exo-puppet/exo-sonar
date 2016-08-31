@@ -69,6 +69,7 @@ class sonar (
   $backup_remote_user,
   $backup_remote_host,
   $backup_remote_directory,
+  $es_heap                              = '2g',
 ) {
 
   include sonar::params
@@ -100,13 +101,19 @@ class sonar (
   file { "${sonar::params::extensions_dir}/plugins" :
     ensure      => directory,
   } ->
+  file { "${sonar::params::sonar_conf_dir}" :
+    ensure      => directory,
+    owner       => '999',
+    group       => '999',
+    mode        => '770',
+  } ->
   file { "${sonar::params::mysql_data_dir}" :
     ensure      => directory,
     owner       => '999',
     group       => '999',
     mode        => '770',
   } ->
-  file { "${sonar::params::mysql_config_dir}" :
+  file { "${sonar::params::mysql_conf_dir}" :
     ensure      => directory,
     owner       => 'root',
     group       => '999',
@@ -137,12 +144,25 @@ class sonar (
     owner       => 'root',
     group       => '999',
     mode        => '640',
+    require     => [File["${sonar::params::mysql_conf_dir}"]]
   } -> file { "${sonar::install_dir}/mysql_init/user_backup.sql" :
     ensure      => present,
     content     => template ('sonar/mysql/user.sql.erb'),
     owner       => 'root',
     group       => '999',
     mode        => '640',
+  }
+
+  ########################
+  ## Sonar configuration
+  ########################
+  file { "${sonar::params::sonar_conf_dir}/sonar.properties" :
+    ensure      => present,
+    content     => template ('sonar/sonar.properties.erb'),
+    owner       => 'root',
+    group       => '999',
+    mode        => '640',
+    require     => [File["${sonar::params::sonar_conf_dir}"]]
   }
 
   ########################

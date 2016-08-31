@@ -23,6 +23,7 @@ services:
     volumes:
       - <%= scope['sonar::params::data_dir'] %>:/opt/sonarqube/data
       - <%= scope['sonar::params::extensions_dir'] %>:/opt/sonarqube/extensions
+      - <%= scope['sonar::params::sonar_conf_dir'] %>/sonar.properties:/opt/sonarqube/conf/sonar.properties:ro
     networks:
       front:
         aliases:
