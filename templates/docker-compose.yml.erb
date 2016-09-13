@@ -29,9 +29,11 @@ services:
         aliases:
           - sonar
       database:
+<% if scope['sonar::sonar_container_labels'].size > 0 -%>
     labels:
 <% scope['sonar::sonar_container_labels'].each do |label| -%>
       - "<%= label %>"
+<% end -%>
 <% end -%>
 <% if scope['sonar::parameters'].size > 0 -%>
     command : [ <% scope['sonar::parameters'].each do |parameter| -%>"<%= parameter -%>", <% end -%> ]
@@ -50,7 +52,9 @@ services:
       - <%= scope['sonar::install_dir'] %>/mysql_init/:/docker-entrypoint-initdb.d
     networks:
       database:
+<% if scope['sonar::mysql_container_labels'].size > 0 -%>
     labels:
 <% scope['sonar::mysql_container_labels'].each do |label| -%>
       - "<%= label %>"
+<% end -%>
 <% end -%>
