@@ -62,6 +62,7 @@ class sonar (
   $front_network                        = undef,
   $parameters                           = [],
   $install_crowd_plugin                 = false,
+  $install_exo_rules                    = false,
   $backup_db_user                       = 'backup',
   $backup_db_password                   = 'backup',
   $backup_history                       = 180,
@@ -184,6 +185,19 @@ class sonar (
       source_url          => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/2.0/sonar-crowd-plugin-2.0.jar",
       target_directory    => "${sonar::params::extensions_dir}/plugins",
       target_file         => "sonar-crowd-plugin-2.0.jar",
+      require             => File["${sonar::params::extensions_dir}/plugins"],
+      notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
+    }
+  }
+
+  ########################
+  ## Sonar eXo Rules
+  ########################
+  if $sonar::install_exo_rules == true {
+    wget::fetch { 'sonar_exo_rules':
+      source_url          => "https://repository.exoplatform.org/content/groups/public/org/exoplatform/swf/sonar-exo-rules/1.0.0/sonar-exo-rules-1.0.0.jar",
+      target_directory    => "${sonar::params::extensions_dir}/plugins",
+      target_file         => "sonar-exo-rules-1.0.0.jar",
       require             => File["${sonar::params::extensions_dir}/plugins"],
       notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
     }
