@@ -50,10 +50,12 @@
 #  Useful to allow a reverse proxy to reach the sonar container network
 ################################################################################
 class sonar (
-  $version            = '5.6.1-alpine',
-  $install_dir        = '/opt/sonar',
-  $base_data_dir      = '/srv/sonar',
-  $log_dir            = '/var/log/sonar',
+  $version                              = '5.6.1-alpine',
+  $version_crowdin_plugin               = '2.0',
+  $version_exo_rules                    = '1.0.0',
+  $install_dir                          = '/opt/sonar',
+  $base_data_dir                        = '/srv/sonar',
+  $log_dir                              = '/var/log/sonar',
   $database_password,
   $database_root_password,
   $mysql_innodb_buffer_pool_size        = '8g',
@@ -182,9 +184,9 @@ class sonar (
   ########################
   if $sonar::install_crowd_plugin == true {
     wget::fetch { 'sonar_crowd':
-      source_url          => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/2.0/sonar-crowd-plugin-2.0.jar",
+      source_url          => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/${sonar::version_crowdin_plugin}/sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
       target_directory    => "${sonar::params::extensions_dir}/plugins",
-      target_file         => "sonar-crowd-plugin-2.0.jar",
+      target_file         => "sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
       require             => File["${sonar::params::extensions_dir}/plugins"],
       notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
     }
@@ -195,9 +197,9 @@ class sonar (
   ########################
   if $sonar::install_exo_rules == true {
     wget::fetch { 'sonar_exo_rules':
-      source_url          => "https://repository.exoplatform.org/content/groups/public/org/exoplatform/swf/sonar-exo-rules/1.0.0/sonar-exo-rules-1.0.0.jar",
+      source_url          => "https://repository.exoplatform.org/content/groups/public/org/exoplatform/swf/sonar-exo-rules/${sonar::version_exo_rules}/sonar-exo-rules-${sonar::version_exo_rules}.jar",
       target_directory    => "${sonar::params::extensions_dir}/plugins",
-      target_file         => "sonar-exo-rules-1.0.0.jar",
+      target_file         => "sonar-exo-rules-${sonar::version_exo_rules}.jar",
       require             => File["${sonar::params::extensions_dir}/plugins"],
       notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
     }
