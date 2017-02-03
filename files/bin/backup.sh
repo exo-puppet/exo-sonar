@@ -11,11 +11,8 @@ DATE=$(date +%Y%m%d-%H%M%S)
 DB_BACKUP_NAME=sonar_db_${DATE}.sql.bz2
 EXT_BACKUP_NAME=sonar_extensions_${DATE}.tar.bz2
 
-docker pull exoplatform/mysql-backup:latest
-
-
 echo Backuping mysql...
-docker run --rm -e DATABASE=sonar -e USER=${BACKUP_DB_USER} -e PASSWORD=${BACKUP_DB_PASSWORD} --network sonar_database -e FULLNAME=${DB_BACKUP_NAME} --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups exoplatform/mysql-backup
+docker run --rm --network sonar_database --link sonar_mysql_1:db -v ${BACKUP_DIRECTORY}:/backups mysql:5.7 mysqldump -u"${BACKUP_DB_USER}" -h db -p"${BACKUP_DB_PASSWORD}" sonar | pbzip2 > ${BACKUP_DIRECTORY}/${DB_BACKUP_NAME}
 
 chown sonar:sonar ${BACKUP_DIRECTORY}/*
 
