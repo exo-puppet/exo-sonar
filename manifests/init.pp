@@ -59,6 +59,7 @@ class sonar (
   $database_password,
   $database_root_password,
   $mysql_innodb_buffer_pool_size        = '8g',
+  $mysql_expose_port_locally            = false,
   $sonar_container_labels               = [],
   $mysql_container_labels               = [],
   $front_network                        = undef,

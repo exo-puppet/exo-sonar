@@ -40,6 +40,12 @@ services:
 <% end -%> 
   mysql:
     image: mysql:5.7
+    <%- if scope['sonar::mysql_expose_port_locally'] -%>
+    ports:
+      - "127.0.0.1:3306:3306"
+    <%- else -%>
+    # we don't expose mysql port locally
+    <%- end -%>
     environment:
       - MYSQL_ROOT_PASSWORD=<%= scope['sonar::database_root_password'] %>
       - MYSQL_DATABASE=sonar
