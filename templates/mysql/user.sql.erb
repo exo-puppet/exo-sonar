@@ -1,5 +1,5 @@
 -- ##################
 -- # File managed by puppet, don't edit
 -- ##################
-grant usage on *.* to '<%= scope['sonar::backup_user'] %>'@'%' identified by '<%= scope['sonar::backup_password'] %>';
-GRANT SELECT, LOCK TABLES ON sonar.* to '<%= scope['sonar::backup_user'] %>'@'%';
+GRANT USAGE ON *.* TO '<%= scope['sonar::backup_db_user'] %>'@'%' IDENTIFIED BY '<%= scope['sonar::backup_db_password'] %>';
+GRANT SELECT, LOCK TABLES ON sonar.* TO '<%= scope['sonar::backup_db_user'] %>'@'%';
