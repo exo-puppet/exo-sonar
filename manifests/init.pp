@@ -141,15 +141,19 @@ class sonar (
   ########################
   ## Mysql configuration
   ########################
-  file { "${sonar::params::mysql_config_dir}/sonar.cnf" :
+  file { '/sonar.cnf': # 2019-01-31 : this could be removed when applied everywhere
+    ensure => absent
+  }
+  file { "${sonar::params::mysql_conf_dir}/sonar.cnf" :
     ensure      => present,
     content     => template ('sonar/sonar.cnf.erb'),
     owner       => 'root',
     group       => '999',
     mode        => '640',
-    require     => [File["${sonar::params::mysql_conf_dir}"]]
-  } -> file { "${sonar::install_dir}/mysql_init/user_backup.sql" :
-    ensure      => present,
+    require     => File["${sonar::params::mysql_conf_dir}"]
+  }
+  file { "${sonar::install_dir}/mysql_init/user_backup.sql" :
+    ensure      => file,
     content     => template ('sonar/mysql/user.sql.erb'),
     owner       => 'root',
     group       => '999',
@@ -160,7 +164,7 @@ class sonar (
   ## Sonar configuration
   ########################
   file { "${sonar::params::sonar_conf_dir}/sonar.properties" :
-    ensure      => present,
+    ensure      => file,
     content     => template ('sonar/sonar.properties.erb'),
     owner       => 'root',
     group       => '999',
@@ -212,7 +216,12 @@ class sonar (
     ensure  => 'present',
     require => [
       Class['docker::compose'],
-      File["${sonar::install_dir}/docker-compose.yml"],
+      File[
+        "${sonar::install_dir}/docker-compose.yml",
+        "${sonar::params::mysql_conf_dir}/sonar.cnf",
+        "${sonar::params::sonar_conf_dir}/sonar.properties",
+        "${sonar::install_dir}/mysql_init/user_backup.sql"
+      ],
     ],
   }
 
