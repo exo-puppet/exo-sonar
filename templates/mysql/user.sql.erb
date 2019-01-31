@@ -1,5 +1,6 @@
 -- ##################
 -- # File managed by puppet, don't edit
 -- ##################
+CREATE USER IF NOT EXISTS '<%= scope['sonar::backup_db_user'] %>'@'%' IDENTIFIED BY '<%= scope['sonar::backup_db_password'] %>';
 GRANT USAGE ON *.* TO '<%= scope['sonar::backup_db_user'] %>'@'%' IDENTIFIED BY '<%= scope['sonar::backup_db_password'] %>';
 GRANT SELECT, LOCK TABLES ON sonar.* TO '<%= scope['sonar::backup_db_user'] %>'@'%';
