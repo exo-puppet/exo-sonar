@@ -81,61 +81,61 @@ class sonar (
   ## Directories
   ########################
   file { "${sonar::install_dir}/bin" :
+    ensure  => directory,
+    source  => 'puppet:///modules/sonar/bin',
+    recurse => true,
+    owner   => 'root',
+    group   => 'sonar',
+    mode    => '0750',
+    require => File[$sonar::install_dir]
+  }
+  -> file { $sonar::log_dir :
     ensure      => directory,
-    source      => 'puppet:///modules/sonar/bin',
-    recurse     => true,
-    owner       => 'root',
-    group       => 'sonar',
-    mode        => '750',
-    require     => [File["${sonar::install_dir}"]]
-  } ->
-  file { "${sonar::log_dir}" :
+  }
+  -> file { $sonar::base_data_dir :
     ensure      => directory,
-  } ->
-  file { "${sonar::base_data_dir}" :
+  }
+  -> file { $sonar::params::data_dir :
     ensure      => directory,
-  } ->
-  file { "${sonar::params::data_dir}" :
+  }
+  -> file { $sonar::params::extensions_dir :
     ensure      => directory,
-  } ->
-  file { "${sonar::params::extensions_dir}" :
+  }
+  -> file { "${sonar::params::extensions_dir}/plugins" :
     ensure      => directory,
-  } ->
-  file { "${sonar::params::extensions_dir}/plugins" :
+  }
+  -> file { $sonar::params::sonar_conf_dir :
+    ensure => directory,
+    owner  => '999',
+    group  => '999',
+    mode   => '0770',
+  }
+  -> file { $sonar::params::mysql_data_dir :
+    ensure => directory,
+    owner  => '999',
+    group  => '999',
+    mode   => '0770',
+  }
+  -> file { $sonar::params::mysql_conf_dir :
+    ensure => directory,
+    owner  => 'root',
+    group  => '999',
+    mode   => '0644',
+  }
+  -> file { $sonar::params::mysql_log_dir :
+    ensure => directory,
+    owner  => 'root',
+    group  => '999',
+    mode   => '0775',
+  }
+  -> file { "${sonar::install_dir}/mysql_init" :
     ensure      => directory,
-  } ->
-  file { "${sonar::params::sonar_conf_dir}" :
-    ensure      => directory,
-    owner       => '999',
-    group       => '999',
-    mode        => '770',
-  } ->
-  file { "${sonar::params::mysql_data_dir}" :
-    ensure      => directory,
-    owner       => '999',
-    group       => '999',
-    mode        => '770',
-  } ->
-  file { "${sonar::params::mysql_conf_dir}" :
-    ensure      => directory,
-    owner       => 'root',
-    group       => '999',
-    mode        => '644',
-  } ->
-  file { "${sonar::params::mysql_log_dir}" :
-    ensure      => directory,
-    owner       => 'root',
-    group       => '999',
-    mode        => '775',
-  } ->
-  file { "${sonar::install_dir}/mysql_init" :
-    ensure      => directory,
-  } ->
-  file { "${sonar::backup_directory}" :
-    ensure      => directory,
-    owner       => 'sonar',
-    group       => 'root',
-    mode        => '770',
+  }
+  -> file { $sonar::backup_directory :
+    ensure => directory,
+    owner  => 'sonar',
+    group  => 'root',
+    mode   => '0770',
   }
 
   ########################
@@ -145,42 +145,42 @@ class sonar (
     ensure => absent
   }
   file { "${sonar::params::mysql_conf_dir}/sonar.cnf" :
-    ensure      => present,
-    content     => template ('sonar/sonar.cnf.erb'),
-    owner       => 'root',
-    group       => '999',
-    mode        => '640',
-    require     => File["${sonar::params::mysql_conf_dir}"]
+    ensure  => present,
+    content => template ('sonar/sonar.cnf.erb'),
+    owner   => 'root',
+    group   => '999',
+    mode    => '0640',
+    require => File[$sonar::params::mysql_conf_dir]
   }
   file { "${sonar::install_dir}/mysql_init/user_backup.sql" :
-    ensure      => file,
-    content     => template ('sonar/mysql/user.sql.erb'),
-    owner       => 'root',
-    group       => '999',
-    mode        => '640',
+    ensure  => file,
+    content => template ('sonar/mysql/user.sql.erb'),
+    owner   => 'root',
+    group   => '999',
+    mode    => '0640',
   }
 
   ########################
   ## Sonar configuration
   ########################
   file { "${sonar::params::sonar_conf_dir}/sonar.properties" :
-    ensure      => file,
-    content     => template ('sonar/sonar.properties.erb'),
-    owner       => 'root',
-    group       => '999',
-    mode        => '640',
-    require     => [File["${sonar::params::sonar_conf_dir}"]]
+    ensure  => file,
+    content => template ('sonar/sonar.properties.erb'),
+    owner   => 'root',
+    group   => '999',
+    mode    => '0640',
+    require => File[$sonar::params::sonar_conf_dir]
   }
 
   ########################
   ## Docker compose file
   ########################
   file { "${sonar::install_dir}/docker-compose.yml" :
-    ensure      => 'present',
-    content     => template ('sonar/docker-compose.yml.erb'),
-    owner       => 'root',
-    group       => 'root',
-    mode        => '640',
+    ensure  => 'present',
+    content => template ('sonar/docker-compose.yml.erb'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0640',
   }
 
   ########################
@@ -188,11 +188,11 @@ class sonar (
   ########################
   if $sonar::install_crowd_plugin == true {
     wget::fetch { 'sonar_crowd':
-      source_url          => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/${sonar::version_crowdin_plugin}/sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
-      target_directory    => "${sonar::params::extensions_dir}/plugins",
-      target_file         => "sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
-      require             => File["${sonar::params::extensions_dir}/plugins"],
-      notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
+      source_url       => "http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-crowd-plugin/${sonar::version_crowdin_plugin}/sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
+      target_directory => "${sonar::params::extensions_dir}/plugins",
+      target_file      => "sonar-crowd-plugin-${sonar::version_crowdin_plugin}.jar",
+      require          => File["${sonar::params::extensions_dir}/plugins"],
+      notify           => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
     }
   }
 
@@ -201,11 +201,11 @@ class sonar (
   ########################
   if $sonar::install_exo_rules == true {
     wget::fetch { 'sonar_exo_rules':
-      source_url          => "https://repository.exoplatform.org/content/groups/public/org/exoplatform/swf/sonar-exo-rules/${sonar::version_exo_rules}/sonar-exo-rules-${sonar::version_exo_rules}.jar",
-      target_directory    => "${sonar::params::extensions_dir}/plugins",
-      target_file         => "sonar-exo-rules-${sonar::version_exo_rules}.jar",
-      require             => File["${sonar::params::extensions_dir}/plugins"],
-      notify              => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
+      source_url       => "https://repository.exoplatform.org/content/groups/public/org/exoplatform/swf/sonar-exo-rules/${sonar::version_exo_rules}/sonar-exo-rules-${sonar::version_exo_rules}.jar",
+      target_directory => "${sonar::params::extensions_dir}/plugins",
+      target_file      => "sonar-exo-rules-${sonar::version_exo_rules}.jar",
+      require          => File["${sonar::params::extensions_dir}/plugins"],
+      notify           => Docker_compose["${sonar::install_dir}/docker-compose.yml"],
     }
   }
 
@@ -231,10 +231,10 @@ class sonar (
   file { "${sonar::install_dir}/bin/_setenv.sh" :
     ensure  => 'present',
     content => template('sonar/bin/_setenv.sh.erb'),
-    owner       => 'root',
-    group       => 'sonar',
-    mode        => '750',
-    require     => [File["${sonar::install_dir}/bin"]]
+    owner   => 'root',
+    group   => 'sonar',
+    mode    => '0750',
+    require => [File["${sonar::install_dir}/bin"]]
   }
 
 }
