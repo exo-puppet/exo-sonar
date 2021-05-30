@@ -50,7 +50,7 @@
 #  Useful to allow a reverse proxy to reach the sonar container network
 ################################################################################
 class sonar (
-  $version                              = '5.6.1-alpine',
+  $version                              = '6.7.5-alpine',
   $version_crowdin_plugin               = '2.0',
   $version_exo_rules                    = '1.0.0',
   $install_dir                          = '/opt/sonar',
